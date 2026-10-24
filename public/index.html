@@ -1,0 +1,384 @@
+<!-- Đường dẫn file: public/index.html -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WC 2026 — Data Hub & Insights</title>
+  <meta name="description" content="Hệ thống Quản lý, Tra cứu và Thống kê Giải đấu FIFA World Cup 2026 tích hợp SQL Server." />
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              navy: '#092C74',
+              blue: '#1346A8',
+              pill: '#0B3B8C',
+              sidebarBg: '#DCE7FE',
+              sidebarText: '#1E40AF'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white">
+
+  <div class="flex min-h-screen">
+    <!-- ==================== SIDEBAR BÊN TRÁI ==================== -->
+    <aside class="w-56 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 fixed inset-y-0 left-0 z-30">
+      <div>
+        <!-- Logo Header -->
+        <div class="h-16 px-5 flex items-center gap-3 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-lg shadow-sm">
+            🏆
+          </div>
+          <div>
+            <h1 class="text-sm font-extrabold tracking-tight text-slate-900 leading-none">WC 2026</h1>
+            <p class="text-[11px] text-slate-400 font-medium mt-1">Data Hub & Insights</p>
+          </div>
+        </div>
+
+        <!-- Menu Điều hướng -->
+        <div class="px-3 py-5">
+          <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">MAIN</p>
+          <nav class="space-y-1" aria-label="Main Navigation">
+            <button data-view="matches" class="nav-btn active w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all">
+              <span>⚽</span>
+              <span>Match Results</span>
+            </button>
+            <button data-view="tournament" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all">
+              <span>🏆</span>
+              <span>Tournament</span>
+            </button>
+            <button data-view="teams" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all">
+              <span>🌍</span>
+              <span>Team Stats</span>
+            </button>
+            <button data-view="players" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all">
+              <span>👟</span>
+              <span>Player Stats</span>
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Footer Tác giả -->
+      <div class="p-3 border-t border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-purple-600 text-white text-xs font-bold flex items-center justify-center">
+            TM
+          </div>
+          <div>
+            <p class="text-xs font-bold text-slate-800 leading-tight">Nhóm BTL HQT</p>
+            <p class="text-[10px] text-slate-400">SQL Server Author</p>
+          </div>
+        </div>
+        <span class="text-slate-400 text-xs">⌄</span>
+      </div>
+    </aside>
+
+    <!-- ==================== VÙNG NỘI DUNG CHÍNH ==================== -->
+    <div class="flex-1 pl-56 flex flex-col min-h-screen">
+      <!-- Topbar -->
+      <header class="h-14 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-20">
+        <h2 id="topbar-title" class="text-xs font-bold text-slate-800">Match Results</h2>
+        <div class="flex items-center gap-4">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-red-50 text-red-600 border border-red-100">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+            Tournament Inactive
+          </span>
+          <span id="topbar-date" class="text-xs text-slate-400 font-medium">Friday, October 23, 2026</span>
+        </div>
+      </header>
+
+      <!-- Main Container -->
+      <main class="flex-1 p-8 max-w-7xl w-full mx-auto">
+
+        <!-- ================= VIEW 1: MATCH RESULTS ================= -->
+        <section id="view-matches" class="view-section space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 class="text-xl font-extrabold text-brand-navy">Match Results</h1>
+              <div class="flex items-center gap-3 mt-1">
+                <span id="matches-last-updated" class="text-xs text-slate-400">Last updated: --:--:--</span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200">
+                  ⚡ Live · updates every 1 min
+                </span>
+              </div>
+            </div>
+            <button id="btn-refresh-matches" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition">
+              <span>🔄</span>
+              <span>Refresh</span>
+            </button>
+          </div>
+
+          <!-- Nhóm Today -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-bold text-brand-navy">Today</h3>
+            <div id="matches-today-list" class="space-y-3"></div>
+          </div>
+
+          <!-- Nhóm Past -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-bold text-brand-navy">Past</h3>
+            <div id="matches-past-list" class="space-y-3"></div>
+          </div>
+
+          <!-- Nhóm Upcoming -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-bold text-brand-navy">Upcoming</h3>
+            <div id="matches-upcoming-list" class="space-y-3"></div>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 2: TOURNAMENT ================= -->
+        <section id="view-tournament" class="view-section hidden space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2.5">
+              <h1 class="text-xl font-extrabold text-brand-navy">Tournament</h1>
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">12 Groups</span>
+            </div>
+            <span id="tournament-sync-time" class="text-[11px] text-slate-400">Last synced: --</span>
+          </div>
+
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium">
+            <span>🕒</span>
+            <span>Data may be delayed up to <strong>6 hours</strong></span>
+          </div>
+
+          <!-- Thanh chọn Vòng đấu (Stages) -->
+          <div id="tournament-stage-tabs" class="flex flex-wrap items-center gap-2">
+            <button data-stage="Groups" class="stage-pill active px-4 py-1.5 rounded-lg text-xs font-bold transition">Groups</button>
+            <button data-stage="32" class="stage-pill px-4 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition">R32</button>
+            <button data-stage="16" class="stage-pill px-4 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition">R16</button>
+            <button data-stage="Quarter" class="stage-pill px-4 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition">Quarter-finals</button>
+            <button data-stage="Semi" class="stage-pill px-4 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition">Semi-finals</button>
+            <button data-stage="Final" class="stage-pill px-4 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition">Final</button>
+          </div>
+
+          <!-- Thanh chọn 12 Bảng đấu (Group A -> Group L) -->
+          <div id="tournament-group-tabs" class="flex flex-wrap items-center gap-2"></div>
+
+          <!-- Lưới 2 cột: Bảng xếp hạng (Trái) & Danh sách trận đấu (Phải) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <!-- Cột Trái: Standings -->
+            <div id="standings-card-wrapper" class="lg:col-span-6 bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 id="standings-group-title" class="text-xs font-bold text-slate-800">Group A — Standings</h3>
+                  <p class="text-[11px] text-slate-400">Top 2 advance</p>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700">Phase 1</span>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="border-b border-slate-100 text-[10px] font-bold uppercase text-slate-400">
+                      <th class="py-2.5 px-2 w-8">#</th>
+                      <th class="py-2.5 px-2">TEAM</th>
+                      <th class="py-2.5 px-2 text-center">P</th>
+                      <th class="py-2.5 px-2 text-center">W</th>
+                      <th class="py-2.5 px-2 text-center">D</th>
+                      <th class="py-2.5 px-2 text-center">L</th>
+                      <th class="py-2.5 px-2 text-center">GD</th>
+                      <th class="py-2.5 px-2 text-center">PTS</th>
+                    </tr>
+                  </thead>
+                  <tbody id="standings-tbody" class="divide-y divide-slate-100 text-xs font-semibold"></tbody>
+                </table>
+              </div>
+
+              <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-4 text-[11px] font-semibold">
+                <span class="inline-flex items-center gap-1.5 text-emerald-600">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Qualify (R32)
+                </span>
+                <span class="inline-flex items-center gap-1.5 text-red-500">
+                  <span class="w-2 h-2 rounded-full bg-red-500"></span> Eliminated
+                </span>
+              </div>
+            </div>
+
+            <!-- Cột Phải: Danh sách trận trong Bảng / Vòng -->
+            <div id="tournament-matches-wrapper" class="lg:col-span-6 space-y-3">
+              <div class="flex items-center gap-2">
+                <h3 id="tournament-matches-title" class="text-xs font-bold text-slate-800">Group A — Matches</h3>
+                <span class="text-[11px] text-slate-400">0 live · 0 upcoming</span>
+              </div>
+              <div id="tournament-matches-list" class="space-y-3"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 3: TEAM STATS ================= -->
+        <section id="view-teams" class="view-section hidden space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2.5">
+              <h1 class="text-xl font-extrabold text-brand-navy">Team Stats</h1>
+              <span id="teams-count-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">48 teams</span>
+            </div>
+            <span class="text-[11px] text-slate-400">Last synced: SQL Server Live</span>
+          </div>
+
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium">
+            <span>🕒</span>
+            <span>Data may be delayed up to <strong>6 hours</strong></span>
+          </div>
+
+          <!-- Thanh Search & Quick Pick -->
+          <div class="bg-white rounded-xl border border-slate-200 p-3 flex flex-wrap items-center gap-3 shadow-sm">
+            <div class="relative w-60">
+              <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 text-xs">🔍</span>
+              <input id="team-search-input" type="text" placeholder="Search teams..." class="w-full pl-8 pr-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:border-blue-600" />
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">QUICK PICK</span>
+            <div id="team-quick-picks" class="flex flex-wrap items-center gap-1.5 flex-1"></div>
+          </div>
+
+          <!-- Hero Banner Đội tuyển -->
+          <div id="team-hero-banner" class="hero-gradient rounded-2xl p-6 text-white shadow-md flex flex-wrap items-center justify-between gap-4"></div>
+
+          <!-- 6 Thẻ KPI Đội tuyển -->
+          <div id="team-kpi-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5"></div>
+
+          <!-- 3 Khối Phân tích: Recent Form, Performance, Upcoming -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Recent Form -->
+            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+              <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-3">RECENT FORM</h4>
+              <div id="team-form-badges" class="flex items-center gap-1.5 mb-3"></div>
+              <p class="text-[11px] text-slate-400 mb-2">Recent results:</p>
+              <div id="team-form-details" class="space-y-1 text-xs text-slate-600"></div>
+            </div>
+
+            <!-- Performance Bars -->
+            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3.5">
+              <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-400">PERFORMANCE</h4>
+              <div id="team-performance-bars" class="space-y-3"></div>
+            </div>
+
+            <!-- Upcoming Match -->
+            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center justify-center text-center">
+              <p class="text-xs text-slate-400 font-medium">No upcoming match scheduled</p>
+            </div>
+          </div>
+
+          <!-- Cầu thủ xuất sắc nhất đội (TEAM TOP RATED) -->
+          <div id="team-top-rated-banner" class="bg-amber-50/70 border border-amber-200/80 rounded-xl px-5 py-3.5 flex items-center justify-between"></div>
+
+          <!-- Sơ đồ đội hình & Sân bóng (Squad & Starting XI) -->
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 id="team-squad-title" class="text-sm font-bold text-slate-800">Squad · 26 players</h3>
+              <div id="team-position-counts" class="flex items-center gap-2 text-[11px] font-semibold"></div>
+            </div>
+
+            <!-- Mặt sân bóng đá -->
+            <div class="pitch-container max-w-2xl mx-auto rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+              <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider mb-4 relative z-10">
+                <span class="bg-black/25 px-2.5 py-0.5 rounded">4-3-3 / STARTING XI</span>
+                <span class="text-white/80">STARTING XI</span>
+              </div>
+              <div id="team-pitch-lineup" class="space-y-6 relative z-10 py-2"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 4: PLAYER STATS (LEADERBOARD) ================= -->
+        <section id="view-players" class="view-section hidden space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 class="text-xl font-extrabold text-brand-navy">Player Stats</h1>
+              <p id="players-subtitle" class="text-xs text-slate-400 mt-0.5">Golden Boot leaderboard · Top players</p>
+            </div>
+            <span class="text-[11px] text-slate-400">Last synced: SQL Server Live</span>
+          </div>
+
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium">
+            <span>🕒</span>
+            <span>Data may be delayed up to <strong>6 hours</strong></span>
+          </div>
+
+          <!-- Thanh tìm kiếm cầu thủ -->
+          <div class="bg-white rounded-xl border border-slate-200 px-4 py-2.5 shadow-sm flex items-center gap-2">
+            <span class="text-slate-400 text-sm">🔍</span>
+            <input id="player-search-input" type="text" placeholder="Search player or team..." class="w-full text-xs focus:outline-none text-slate-800" />
+          </div>
+
+          <!-- Bảng xếp hạng Golden Boot -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-100 text-[10px] font-bold uppercase text-slate-400 bg-slate-50/50">
+                    <th class="py-3 px-4 w-12">#</th>
+                    <th class="py-3 px-4">PLAYER</th>
+                    <th class="py-3 px-4 text-center">GOALS</th>
+                    <th class="py-3 px-4 text-center">ASSISTS</th>
+                    <th class="py-3 px-4 text-center">SHOTS</th>
+                    <th class="py-3 px-4 text-center">MINS/G</th>
+                    <th class="py-3 px-4 text-center">RATING</th>
+                  </tr>
+                </thead>
+                <tbody id="players-tbody" class="divide-y divide-slate-100 text-xs"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Khối Podium Top 3 Cầu thủ -->
+          <div id="players-podium-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2"></div>
+        </section>
+
+        <!-- ================= VIEW 5: PLAYER DETAIL ================= -->
+        <section id="view-player-detail" class="view-section hidden space-y-5">
+          <button id="btn-back-leaderboard" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-brand-navy transition">
+            <span>←</span>
+            <span>Back to leaderboard</span>
+          </button>
+
+          <!-- Hero Banner Cầu thủ -->
+          <div id="player-detail-hero" class="hero-gradient rounded-2xl p-6 text-white shadow-md flex flex-wrap items-center justify-between gap-4"></div>
+
+          <!-- 5 Thẻ KPI Cầu thủ -->
+          <div id="player-detail-kpis" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5"></div>
+
+          <!-- Khối Thanh Hiệu suất (PERFORMANCE) -->
+          <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+            <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-400">PERFORMANCE</h4>
+            <div id="player-detail-bars" class="space-y-4"></div>
+          </div>
+
+          <p id="player-detail-footer-id" class="text-center text-[11px] text-slate-400 pt-2"></p>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL CHI TIẾT TRẬN ĐẤU (MATCH CENTER) ==================== -->
+  <div id="match-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl border border-slate-200 p-6 space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 id="modal-match-stage" class="text-xs font-bold uppercase tracking-wider text-brand-navy">Match Center</h3>
+        <button id="btn-close-modal" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold">✕</button>
+      </div>
+      <div id="modal-match-body" class="space-y-5"></div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

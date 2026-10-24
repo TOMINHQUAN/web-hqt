@@ -1,0 +1,58 @@
+/* Đường dẫn file: public/styles.css */
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Mục menu đang chọn ở Sidebar bên trái */
+.nav-btn.active {
+  background-color: #DCE7FE;
+  color: #1E40AF;
+  font-weight: 700;
+}
+
+/* Nút lọc vòng đấu / bảng đấu đang chọn */
+.stage-pill.active,
+.group-pill.active,
+.team-pill.active {
+  background-color: #0B3B8C !important;
+  color: #FFFFFF !important;
+  border-color: #0B3B8C !important;
+}
+
+/* Nền xanh đậm cho Hero Banner ở Team Stats & Player Detail */
+.hero-gradient {
+  background: linear-gradient(135deg, #092C74 0%, #1346A8 100%);
+}
+
+/* Mặt sân bóng đá hiển thị đội hình Starting XI */
+.pitch-container {
+  background: linear-gradient(180deg, #15803D 0%, #166534 50%, #15803D 100%);
+  border: 3px solid rgba(255, 255, 255, 0.25);
+}
+
+.pitch-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 45%;
+  height: 70px;
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  border-top: none;
+  pointer-events: none;
+}
+
+.pitch-container::after {
+  content: "";
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110px;
+  height: 110px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  pointer-events: none;
+}
